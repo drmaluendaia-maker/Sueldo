@@ -1,383 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Sueldo Médico</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .calendar-day {
-            transition: all 0.2s ease-in-out;
-            position: relative;
-        }
-        .calendar-day:hover {
-            transform: scale(1.05);
-            border-color: #60a5fa; /* blue-400 */
-        }
-        .day-selected-full {
-            background-color: #1e40af; /* blue-800 */
-            color: white;
-            border-color: #1d4ed8; /* blue-700 */
-        }
-        .day-selected-half {
-            background-color: #3b82f6; /* blue-500 */
-            color: white;
-            border-color: #2563eb; /* blue-600 */
-        }
-        .day-badge {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            width: 1.25rem;
-            height: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: white;
-        }
-        .day-state-indicator {
-            position: absolute;
-            bottom: 2px;
-            left: 5px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .badge-a { background-color: #16a34a; } /* green-600 */
-        .badge-b { background-color: #dc2626; } /* red-600 */
-        .badge-c { background-color: #f59e0b; } /* amber-500 */
-        .day-disabled {
-            color: #9ca3af; /* gray-400 */
-            pointer-events: none;
-        }
-        .day-today {
-            border: 2px solid #2563eb; /* blue-600 */
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#0f172a">
+<title>Calculadora de Prestaciones Médicas · Mendoza</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:Inter,sans-serif;background:#f8fafc;color:#0f172a}.card{background:#fff;border:1px solid #e2e8f0;border-radius:1rem}.day{min-height:84px;border:1px solid #e2e8f0;border-radius:.8rem;padding:.5rem;text-align:left;background:#fff;transition:.15s}.day:hover{transform:translateY(-1px);border-color:#94a3b8}.day.on{border:2px solid #0f172a}.blank{visibility:hidden}.tag{display:inline-flex;border-radius:999px;padding:.1rem .4rem;font-size:.65rem;font-weight:700}.week{background:#dbeafe;color:#1d4ed8}.premium{background:#fee2e2;color:#b91c1c}.mixed{background:#fef3c7;color:#b45309}.modalbg{background:rgba(15,23,42,.55)}@media(max-width:640px){.day{min-height:68px}.vsmall{display:none}}@media print{.noprint{display:none!important}body{background:#fff}}
+</style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-800">Calculadora de Sueldo Médico</h1>
-            <p class="text-slate-500 mt-2">Ingresa los montos y haz clic en los días: 1 clic = Guardia Completa, 2 clics = Media Guardia.</p>
-        </div>
-
-        <!-- Inputs Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div>
-                <label for="montoA" class="block text-sm font-medium text-slate-700">Monto Guardia Semana (A)</label>
-                <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <input type="number" id="montoA" class="block w-full rounded-md border-gray-300 pl-7 pr-4 py-2 focus:border-blue-500 focus:ring-blue-500" placeholder="0.00">
-                </div>
-                <p class="text-xs text-slate-500 mt-1">Martes a Jueves</p>
-            </div>
-            <div>
-                <label for="montoB" class="block text-sm font-medium text-slate-700">Monto Guardia Fin de Semana (B)</label>
-                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <input type="number" id="montoB" class="block w-full rounded-md border-gray-300 pl-7 pr-4 py-2 focus:border-blue-500 focus:ring-blue-500" placeholder="0.00">
-                </div>
-                <p class="text-xs text-slate-500 mt-1">Sáb, Dom o víspera de feriado</p>
-            </div>
-            <div>
-                <label for="montoC" class="block text-sm font-medium text-slate-700">Monto Guardia Mixta (C)</label>
-                 <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <input type="text" id="montoC" class="block w-full rounded-md border-gray-300 pl-7 pr-4 py-2 bg-slate-100 cursor-not-allowed" disabled>
-                </div>
-                <p class="text-xs text-slate-500 mt-1">Lun, Vie o post-feriado. (A+B)/2</p>
-            </div>
-        </div>
-        
-        <!-- Calendar and Results Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <!-- Calendar -->
-            <div class="lg:col-span-3">
-                <div class="flex items-center justify-between mb-4">
-                    <button id="prevMonth" class="p-2 rounded-full hover:bg-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                    </button>
-                    <div class="text-center">
-                        <select id="monthSelect" class="font-bold text-xl text-slate-700 border-none rounded-md focus:ring-2 focus:ring-blue-500"></select>
-                        <select id="yearSelect" class="text-xl text-slate-600 border-none rounded-md focus:ring-2 focus:ring-blue-500"></select>
-                    </div>
-                    <button id="nextMonth" class="p-2 rounded-full hover:bg-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                    </button>
-                </div>
-                <div id="calendar-header" class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-500 mb-2">
-                    <div>DOM</div><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div>SÁB</div>
-                </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-2">
-                    <!-- Days will be generated by JS -->
-                </div>
-            </div>
-
-            <!-- Results -->
-            <div class="lg:col-span-2 bg-slate-50 p-6 rounded-lg">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">Resumen del Mes</h3>
-                <div class="space-y-3 text-slate-700">
-                     <p class="text-xs text-center text-slate-500 -mt-2 mb-3">El recuento refleja el equivalente en guardias completas.</p>
-                    <div class="flex justify-between items-center p-3 bg-green-100 rounded-md">
-                        <span class="font-medium">Guardias Semana (A)</span>
-                        <span id="countA" class="font-bold text-lg text-green-800">0</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-red-100 rounded-md">
-                        <span class="font-medium">Guardias Finde/Feriado (B)</span>
-                        <span id="countB" class="font-bold text-lg text-red-800">0</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-amber-100 rounded-md">
-                        <span class="font-medium">Guardias Mixtas (C)</span>
-                        <span id="countC" class="font-bold text-lg text-amber-800">0</span>
-                    </div>
-                </div>
-                <div class="border-t my-6"></div>
-                <div class="text-center">
-                    <p class="text-slate-600">Sueldo Bruto Estimado</p>
-                    <p id="totalSueldo" class="text-4xl font-extrabold text-blue-700 mt-2">$0.00</p>
-                </div>
-                 <button id="resetBtn" class="w-full mt-6 bg-slate-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-slate-600 transition-colors">
-                    Limpiar Selección
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- STATE MANAGEMENT ---
-            let currentDate = new Date();
-            let selectedYear = currentDate.getFullYear();
-            let selectedMonth = currentDate.getMonth();
-            // Map to store day state: 0 = none, 1 = full, 0.5 = half
-            let selectedDays = new Map();
-            
-            // --- DOM ELEMENTS ---
-            const montoA_input = document.getElementById('montoA');
-            const montoB_input = document.getElementById('montoB');
-            const montoC_input = document.getElementById('montoC');
-            const calendarGrid = document.getElementById('calendar-grid');
-            const monthSelect = document.getElementById('monthSelect');
-            const yearSelect = document.getElementById('yearSelect');
-            const prevMonthBtn = document.getElementById('prevMonth');
-            const nextMonthBtn = document.getElementById('nextMonth');
-            const resetBtn = document.getElementById('resetBtn');
-
-            // --- HOLIDAY DATA (ARGENTINA) ---
-            const HOLIDAYS = {
-                2024: ['01-01', '02-12', '02-13', '03-24', '03-29', '04-01', '04-02', '05-01', '05-25', '06-17', '06-20', '07-09', '08-17', '10-12', '11-18', '12-08', '12-25'],
-                2025: ['01-01', '03-03', '03-04', '03-24', '04-18', '04-02', '05-01', '05-25', '06-17', '06-20', '07-09', '08-18', '10-13', '11-20', '12-08', '12-25'],
-                2026: ['01-01', '02-16', '02-17', '03-24', '04-02', '04-03', '05-01', '05-25', '06-17', '06-20', '07-09', '08-17', '10-12', '11-20', '12-08', '12-25']
-            };
-
-            const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-            // --- HELPER FUNCTIONS ---
-            const isHoliday = (date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return HOLIDAYS[year]?.includes(`${month}-${day}`);
-            };
-
-            const isDayBeforeHoliday = (date) => {
-                const tomorrow = new Date(date);
-                tomorrow.setDate(date.getDate() + 1);
-                return isHoliday(tomorrow);
-            };
-
-            const isDayAfterHoliday = (date) => {
-                const yesterday = new Date(date);
-                yesterday.setDate(date.getDate() - 1);
-                return isHoliday(yesterday);
-            };
-            
-            const getShiftType = (date) => {
-                const dayOfWeek = date.getDay(); // Sunday: 0, Saturday: 6
-                if (dayOfWeek === 0 || dayOfWeek === 6 || isDayBeforeHoliday(date)) return 'B';
-                if (dayOfWeek === 1 || dayOfWeek === 5 || isDayAfterHoliday(date)) return 'C';
-                return 'A';
-            };
-
-            // --- CALCULATION LOGIC ---
-            const calculateTotals = () => {
-                const montoA = parseFloat(montoA_input.value) || 0;
-                const montoB = parseFloat(montoB_input.value) || 0;
-                const montoC = (montoA + montoB) / 2;
-                montoC_input.value = montoC > 0 ? montoC.toFixed(2) : '';
-
-                let countA = 0, countB = 0, countC = 0;
-
-                selectedDays.forEach((state, dayString) => {
-                    const date = new Date(dayString + 'T00:00:00'); // Fix timezone issue
-                    if (date.getFullYear() === selectedYear && date.getMonth() === selectedMonth) {
-                        const type = getShiftType(date);
-                        if (type === 'A') countA += state;
-                        else if (type === 'B') countB += state;
-                        else if (type === 'C') countC += state;
-                    }
-                });
-
-                document.getElementById('countA').textContent = countA.toFixed(1).replace('.0', '');
-                document.getElementById('countB').textContent = countB.toFixed(1).replace('.0', '');
-                document.getElementById('countC').textContent = countC.toFixed(1).replace('.0', '');
-
-                const totalSueldo = (countA * montoA) + (countB * montoB) + (countC * montoC);
-                document.getElementById('totalSueldo').textContent = `$${totalSueldo.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            };
-            
-            // --- UI RENDERING ---
-            const updateCellAppearance = (cell, state) => {
-                cell.classList.remove('day-selected-full', 'day-selected-half');
-                const indicator = cell.querySelector('.day-state-indicator');
-                indicator.textContent = '';
-                
-                if (state === 1) {
-                    cell.classList.add('day-selected-full');
-                } else if (state === 0.5) {
-                    cell.classList.add('day-selected-half');
-                    indicator.textContent = '½';
-                }
-            };
-
-            const populateSelectors = () => {
-                monthSelect.innerHTML = '';
-                MONTH_NAMES.forEach((name, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = name;
-                    if (index === selectedMonth) option.selected = true;
-                    monthSelect.appendChild(option);
-                });
-                
-                yearSelect.innerHTML = '';
-                const startYear = currentDate.getFullYear() - 5;
-                const endYear = currentDate.getFullYear() + 5;
-                for (let year = startYear; year <= endYear; year++) {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    if (year === selectedYear) option.selected = true;
-                    yearSelect.appendChild(option);
-                }
-            };
-            
-            const renderCalendar = () => {
-                calendarGrid.innerHTML = '';
-                const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
-                const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-
-                for (let i = 0; i < firstDayOfMonth; i++) calendarGrid.appendChild(document.createElement('div'));
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const cell = document.createElement('div');
-                    const date = new Date(selectedYear, selectedMonth, day);
-                    const dateString = date.toISOString().split('T')[0];
-                    const shiftType = getShiftType(date);
-                    
-                    cell.className = 'calendar-day border rounded-lg p-2 text-center cursor-pointer flex items-center justify-center h-14';
-                    cell.dataset.date = dateString;
-
-                    const dayNumber = document.createElement('span');
-                    dayNumber.textContent = day;
-                    cell.appendChild(dayNumber);
-                    
-                    const badge = document.createElement('div');
-                    badge.className = `day-badge badge-${shiftType.toLowerCase()}`;
-                    badge.textContent = shiftType;
-                    cell.appendChild(badge);
-                    
-                    const indicator = document.createElement('div');
-                    indicator.className = 'day-state-indicator';
-                    cell.appendChild(indicator);
-
-                    const today = new Date();
-                    if (date.toDateString() === today.toDateString()) cell.classList.add('day-today');
-                    
-                    updateCellAppearance(cell, selectedDays.get(dateString) || 0);
-                    
-                    cell.addEventListener('click', () => {
-                        const currentState = selectedDays.get(dateString) || 0;
-                        let nextState;
-                        
-                        if (currentState === 0) nextState = 1;       // none -> full
-                        else if (currentState === 1) nextState = 0.5;  // full -> half
-                        else nextState = 0;                           // half -> none
-
-                        if (nextState === 0) {
-                            selectedDays.delete(dateString);
-                        } else {
-                            selectedDays.set(dateString, nextState);
-                        }
-                        
-                        updateCellAppearance(cell, nextState);
-                        calculateTotals();
-                    });
-                    
-                    calendarGrid.appendChild(cell);
-                }
-                calculateTotals();
-            };
-
-            // --- EVENT LISTENERS ---
-            [montoA_input, montoB_input].forEach(input => input.addEventListener('input', calculateTotals));
-            
-            const changeMonth = (offset) => {
-                selectedMonth += offset;
-                if (selectedMonth < 0) {
-                    selectedMonth = 11;
-                    selectedYear--;
-                } else if (selectedMonth > 11) {
-                    selectedMonth = 0;
-                    selectedYear++;
-                }
-                updateDateAndRender();
-            };
-            
-            prevMonthBtn.addEventListener('click', () => changeMonth(-1));
-            nextMonthBtn.addEventListener('click', () => changeMonth(1));
-            
-            monthSelect.addEventListener('change', (e) => {
-                selectedMonth = parseInt(e.target.value);
-                updateDateAndRender();
-            });
-            
-            yearSelect.addEventListener('change', (e) => {
-                selectedYear = parseInt(e.target.value);
-                updateDateAndRender();
-            });
-
-            resetBtn.addEventListener('click', () => {
-                selectedDays.clear();
-                renderCalendar();
-            });
-            
-            const updateDateAndRender = () => {
-                populateSelectors();
-                renderCalendar();
-            };
-
-            // --- INITIALIZATION ---
-            updateDateAndRender();
-        });
-    </script>
-</body>
-</html>
-
-
+<body>
+<main class="mx-auto max-w-7xl p-4 md:p-8 space-y-6">
+<header class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><div class="text-xs font-bold tracking-[.18em] uppercase text-slate-500">Mendoza · Prestaciones personales</div><h1 class="mt-1 text-2xl md:text-4xl font-extrabold">Calculadora de Prestaciones Médicas</h1><p class="mt-2 text-sm text-slate-500">Resolución 1532/2026 · grillas editables por fecha de vigencia · datos guardados en este navegador.</p></div><div class="noprint flex gap-2"><button id="gridsBtn" class="rounded-xl border bg-white px-4 py-2 text-sm font-semibold">Grillas</button><button id="dataBtn" class="rounded-xl border bg-white px-4 py-2 text-sm font-semibold">Datos</button><button onclick="print()" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Imprimir</button></div></header>
+<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div class="card p-5"><div class="text-xs font-bold uppercase text-slate-500">Bruto estimado</div><div id="total" class="mt-2 text-3xl font-extrabold">$ 0</div></div><div class="card p-5"><div class="text-xs font-bold uppercase text-slate-500">Guardias</div><div id="guardN" class="mt-2 text-3xl font-extrabold">0</div><div id="eq24" class="text-xs text-slate-500">0 equivalentes de 24 h</div></div><div class="card p-5"><div class="text-xs font-bold uppercase text-slate-500">Horas</div><div id="hours" class="mt-2 text-3xl font-extrabold">0 h</div><div id="avg" class="text-xs text-slate-500">$ 0/h</div></div><div class="card p-5"><div class="text-xs font-bold uppercase text-slate-500">Grilla aplicada</div><div id="gridTitle" class="mt-2 font-bold">—</div><div id="gridDate" class="text-xs text-slate-500">—</div></div></section>
+<section class="card p-5"><div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5"><label><span class="text-xs font-bold uppercase text-slate-500">Categoría</span><select id="cat" class="mt-2 w-full rounded-xl border px-3 py-2.5"><option value="specialist">Médico con especialidad</option><option value="general">Médico sin especialidad</option><option value="resident">Residente 3.º / 4.º</option><option value="nonmedical">Profesional no médico</option></select></label><label><span class="text-xs font-bold uppercase text-slate-500">Inicio habitual</span><input id="start" type="time" value="08:00" class="mt-2 w-full rounded-xl border px-3 py-2.5"></label><label><span class="text-xs font-bold uppercase text-slate-500">Duración habitual</span><select id="dur" class="mt-2 w-full rounded-xl border px-3 py-2.5"><option value="24">24 h</option><option value="12">12 h</option><option value="8">8 h</option><option value="6">6 h</option></select></label><div><span class="text-xs font-bold uppercase text-slate-500">Semana 24 h</span><div id="rateW" class="mt-2 rounded-xl bg-blue-50 px-3 py-2.5 font-bold text-blue-800">$ 0</div></div><div><span class="text-xs font-bold uppercase text-slate-500">Finde / feriado 24 h</span><div id="rateP" class="mt-2 rounded-xl bg-red-50 px-3 py-2.5 font-bold text-red-800">$ 0</div></div></div><div id="warn" class="mt-4 hidden rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"></div></section>
+<section class="grid gap-6 lg:grid-cols-5"><div class="lg:col-span-3 card p-4 md:p-6"><div class="noprint mb-4 flex items-center justify-between"><button id="prev" class="rounded-full p-2">←</button><div class="flex gap-2"><select id="month" class="rounded-xl border px-3 py-2 font-bold"></select><select id="year" class="rounded-xl border px-3 py-2 font-bold"></select></div><button id="next" class="rounded-full p-2">→</button></div><div class="grid grid-cols-7 gap-1 md:gap-2 text-center text-[10px] md:text-xs font-bold text-slate-500 mb-2"><div>DOM</div><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div>SÁB</div></div><div id="calendar" class="grid grid-cols-7 gap-1 md:gap-2"></div><p class="noprint mt-4 text-xs text-slate-500">Clic para agregar o quitar una guardia. Hora, duración y criterio pueden editarse en el resumen.</p></div><div class="lg:col-span-2 card p-5"><div class="flex justify-between"><h2 class="text-xl font-bold">Resumen del mes</h2><button id="clear" class="noprint text-xs font-semibold text-slate-500">Limpiar</button></div><div class="mt-4 grid gap-2"><div class="rounded-xl bg-blue-50 p-3 flex justify-between"><span class="text-sm">Horas semana</span><strong id="weekH">0 h</strong></div><div class="rounded-xl bg-red-50 p-3 flex justify-between"><span class="text-sm">Horas finde/feriado</span><strong id="premH">0 h</strong></div><div class="rounded-xl bg-amber-50 p-3 flex justify-between"><span class="text-sm">Guardias mixtas</span><strong id="mixN">0</strong></div></div><div id="shiftList" class="mt-5 space-y-3"></div><div id="emptyShift" class="mt-4 rounded-xl border border-dashed p-4 text-sm text-slate-500">Sin guardias seleccionadas.</div></div></section>
+<section class="card p-5"><div class="flex justify-between gap-3"><div><h2 class="text-xl font-bold">Otras prestaciones</h2><p class="text-sm text-slate-500">Anestesia y prestaciones mensuales/lineales del anexo.</p></div><button id="otherBtn" class="noprint rounded-xl border px-4 py-2 text-sm font-semibold">+ Agregar</button></div><div id="otherList" class="mt-4 space-y-3"></div><div id="emptyOther" class="mt-4 rounded-xl border border-dashed p-4 text-sm text-slate-500">Sin otras prestaciones.</div></section>
+<section class="grid gap-6 lg:grid-cols-2"><details class="card p-5"><summary class="cursor-pointer font-bold">Cómo calcula la app</summary><div class="mt-4 space-y-3 text-sm text-slate-600"><p><strong>24 h:</strong> valor base del anexo. Duraciones diferentes se prorratean proporcionalmente.</p><p><strong>Fin de semana:</strong> viernes 20:00 a lunes 20:00. En modo automático una guardia que cruza franjas se divide por minuto.</p><p><strong>Feriados:</strong> las horas dentro de un feriado cargado usan tarifa de finde/feriado. Se pueden agregar feriados manuales.</p><p><strong>Criterio operativo:</strong> el prorrateo por franja aplica conjuntamente los arts. 2 y 3; cada guardia puede forzarse a una tarifa única si el efector liquida distinto.</p></div></details><details class="card p-5"><summary class="cursor-pointer font-bold">Base normativa</summary><div class="mt-4 space-y-3 text-sm text-slate-600"><p><strong>Res. 1532/2026:</strong> valores desde 01/08/2026.</p><p><strong>Art. 2:</strong> guardias distintas de 24 h se calculan proporcionalmente a las horas efectivamente realizadas.</p><p><strong>Art. 3:</strong> fin de semana desde viernes 20:00 hasta lunes 20:00.</p><p><strong>Art. 4:</strong> deja sin efecto determinados pagos de Estímulos de Equidad Territorial para las guardias alcanzadas.</p><p class="text-xs">Estimación bruta. No reemplaza la liquidación oficial ni agrega conceptos ajenos a la grilla.</p></div></details></section>
+<footer class="pb-8 text-center text-xs text-slate-400">Calculadora local · Mendoza</footer>
+</main>
+<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modalbg"><div class="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-2xl bg-white p-5 md:p-7 shadow-2xl"><div class="flex justify-between"><h2 id="modalTitle" class="text-2xl font-extrabold"></h2><button id="modalClose" class="rounded-full p-2">✕</button></div><div id="modalBody" class="mt-5"></div></div></div>
+<script>
+(()=>{
+const K='sueldoMendoza1532_v3',M=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],C={specialist:'Médico con especialidad',general:'Médico sin especialidad',resident:'Residente 3.º/4.º',nonmedical:'Profesional no médico'},OL={an6:'Anestesia · bloque matutino 6 h',an13:'Anestesia · vespertino comp. 1–3',an45:'Anestesia · vespertino comp. 4–5',med24:'Profesional médico × 24 h semanales',non24:'Profesional no médico × 24 h semanales',nurse40:'Enfermería/técnico asistencial × 40 h',xray30:'Técnico en rayos × 30 h'},H={'2026-01-01':'Año Nuevo','2026-02-16':'Carnaval','2026-02-17':'Carnaval','2026-03-24':'Memoria','2026-04-02':'Malvinas','2026-04-03':'Viernes Santo','2026-05-01':'Día del Trabajador','2026-05-25':'Revolución de Mayo','2026-06-15':'Güemes trasladado','2026-06-20':'Belgrano','2026-07-09':'Independencia','2026-08-17':'San Martín','2026-10-12':'Diversidad Cultural','2026-11-23':'Soberanía trasladada','2026-12-08':'Inmaculada Concepción','2026-12-25':'Navidad'};
+const OFF=[{id:'o-2026-08',effective:'2026-08-01',norm:'Res. 1532/2026 · agosto 2026',official:true,rates:{specialist:{week:377700,premium:519000},general:{week:347750,premium:470800},resident:{week:377700,premium:519000},nonmedical:{week:347750,premium:470800}},other:{an6:248250,an13:248250,an45:372400,med24:1279000,non24:1145000,nurse40:1118500,xray30:1105000}},{id:'o-2026-11',effective:'2026-11-01',norm:'Res. 1532/2026 · noviembre 2026',official:true,rates:{specialist:{week:391850,premium:538400},general:{week:360750,premium:488400},resident:{week:391850,premium:538400},nonmedical:{week:360750,premium:488400}},other:{an6:257500,an13:257500,an45:386400,med24:1327000,non24:1188000,nurse40:1160500,xray30:1145000}}];
+const $=x=>document.getElementById(x),cp=x=>JSON.parse(JSON.stringify(x)),pad=x=>String(x).padStart(2,'0'),ars=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Math.round(n||0)),ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const base=()=>({grids:cp(OFF),months:{},manual:{},ui:{cat:'specialist',start:'08:00',dur:24,month:'2026-08'}});let S;try{S={...base(),...JSON.parse(localStorage.getItem(K)||'null'),ui:{...base().ui,...(JSON.parse(localStorage.getItem(K)||'null')?.ui||{})}}}catch{S=base()}if(!S.grids?.length)S.grids=cp(OFF);if(!S.months)S.months={};if(!S.manual)S.manual={};let cur=new Date(2026,7,1,12);if(S.ui.month){let[a,b]=S.ui.month.split('-').map(Number);if(a&&b)cur=new Date(a,b-1,1,12)}
+const mk=()=>`${cur.getFullYear()}-${pad(cur.getMonth()+1)}`,md=()=>S.months[mk()]||(S.months[mk()]={shifts:[],other:[]}),save=()=>{S.ui={cat:$('cat').value,start:$('start').value,dur:+$('dur').value,month:mk()};localStorage.setItem(K,JSON.stringify(S))},grid=(d=`${mk()}-01`)=>[...S.grids].sort((a,b)=>a.effective.localeCompare(b.effective)).filter(g=>g.effective<=d).pop()||null,holiday=d=>H[ymd(d)]||S.manual[ymd(d)]||'',weekend=d=>{let w=d.getDay(),m=d.getHours()*60+d.getMinutes();return w===6||w===0||(w===5&&m>=1200)||(w===1&&m<1200)};
+function calc(s){let st=new Date(`${s.date}T${s.start}:00`),mins=Math.round(s.duration*60),t=0,w=0,p=0;for(let i=0;i<mins;i++){let d=new Date(st.getTime()+i*60000),g=grid(ymd(d));if(!g)continue;let r=g.rates[$('cat').value],pr=s.mode==='premium'||(s.mode==='auto'&&(weekend(d)||holiday(d)));if(s.mode==='week')pr=false;t+=(pr?r.premium:r.week)/1440;pr?p++:w++}return{t,w,p,mix:w>0&&p>0}}
+function addDay(k){let d=md();d.shifts.some(s=>s.date===k)?d.shifts=d.shifts.filter(s=>s.date!==k):d.shifts.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),date:k,start:$('start').value,duration:+$('dur').value,mode:'auto'});save();render()}
+function cal(){let c=$('calendar');c.innerHTML='';let y=cur.getFullYear(),m=cur.getMonth(),f=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate(),sel=new Set(md().shifts.map(s=>s.date));for(let i=0;i<f;i++)c.insertAdjacentHTML('beforeend','<div class="day blank"></div>');for(let d=1;d<=n;d++){let dt=new Date(y,m,d,12),k=ymd(dt),h=holiday(dt),s=md().shifts.find(x=>x.date===k),b=document.createElement('button');b.className='day'+(sel.has(k)?' on':'');let tag=h?'<span class="tag premium">FERIADO</span>':(dt.getDay()===0||dt.getDay()===6)?'<span class="tag premium">FINDE</span>':(dt.getDay()===1||dt.getDay()===5)?'<span class="tag mixed">CRUCE</span>':'<span class="tag week">SEMANA</span>',v=s?`<div class="vsmall mt-2 text-[11px] font-bold">${ars(calc(s).t)}</div><div class="mt-1 text-[10px] text-slate-500">${s.duration} h · ${s.start}</div>`:h?`<div class="vsmall mt-2 text-[10px] text-slate-500">${h}</div>`:'';b.innerHTML=`<div class="flex justify-between gap-1"><strong>${d}</strong>${tag}</div>${v}`;b.onclick=()=>addDay(k);c.appendChild(b)}}
+function rates(){let g=grid(),r=g?.rates?.[$('cat').value]||{week:0,premium:0};$('rateW').textContent=ars(r.week);$('rateP').textContent=ars(r.premium);$('gridTitle').textContent=g?.norm||'Sin grilla';$('gridDate').textContent=g?`Vigente desde ${g.effective.split('-').reverse().join('/')}`:'—';let latest=[...S.grids].sort((a,b)=>b.effective.localeCompare(a.effective))[0],w=$('warn');if(!g){w.classList.remove('hidden');w.textContent='No existe una grilla aplicable a este mes.'}else if(latest&&`${mk()}-01`>latest.effective){w.classList.remove('hidden');w.textContent=`Última grilla cargada: ${latest.effective.split('-').reverse().join('/')} (${latest.norm}). Se usa por continuidad; verificá si existe una resolución posterior.`}else w.classList.add('hidden')}
+function shifts(){let l=$('shiftList');l.innerHTML='';let a=[...md().shifts].sort((x,y)=>(x.date+x.start).localeCompare(y.date+y.start));$('emptyShift').classList.toggle('hidden',a.length>0);a.forEach(s=>{let c=calc(s),t=c.mix?'Mixta':c.p?'Finde / feriado':'Semana',cl=c.mix?'mixed':c.p?'premium':'week',d=document.createElement('div');d.className='rounded-xl border p-3';d.innerHTML=`<div class="flex justify-between gap-3"><div><div class="flex gap-2"><strong>${s.date.split('-').reverse().join('/')}</strong><span class="tag ${cl}">${t}</span></div><div class="text-xs text-slate-500">${s.start} · ${s.duration} h · ${s.mode==='auto'?'automático':s.mode==='week'?'semana forzada':'premium forzada'}</div></div><div class="text-right"><strong>${ars(c.t)}</strong><button data-id="${s.id}" class="edit noprint block ml-auto text-xs font-semibold text-blue-600">Editar</button></div></div>`;l.appendChild(d)});l.querySelectorAll('.edit').forEach(b=>b.onclick=()=>editShift(b.dataset.id))}
+function others(){let l=$('otherList'),a=md().other||[],g=grid();l.innerHTML='';$('emptyOther').classList.toggle('hidden',a.length>0);a.forEach(o=>{let u=g?.other?.[o.type]||0,d=document.createElement('div');d.className='rounded-xl border p-3 flex justify-between gap-3';d.innerHTML=`<div><strong>${OL[o.type]}</strong><div class="text-xs text-slate-500">${o.qty} × ${ars(u)}</div></div><div class="text-right"><strong>${ars(u*o.qty)}</strong><button data-id="${o.id}" class="rm noprint block ml-auto text-xs text-red-600">Quitar</button></div>`;l.appendChild(d)});l.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{md().other=md().other.filter(o=>o.id!==b.dataset.id);save();render()})}
+function summary(){let t=0,h=0,w=0,p=0,m=0;md().shifts.forEach(s=>{let c=calc(s);t+=c.t;h+=+s.duration;w+=c.w/60;p+=c.p/60;if(c.mix)m++});let g=grid();(md().other||[]).forEach(o=>t+=(g?.other?.[o.type]||0)*o.qty);$('total').textContent=ars(t);$('guardN').textContent=md().shifts.length;$('eq24').textContent=`${(h/24).toFixed(2).replace(/\.00$/,'')} equivalentes de 24 h`;$('hours').textContent=`${h.toFixed(1).replace(/\.0$/,'')} h`;$('avg').textContent=`Promedio: ${h?ars(t/h):ars(0)}/h`;$('weekH').textContent=`${w.toFixed(1).replace(/\.0$/,'')} h`;$('premH').textContent=`${p.toFixed(1).replace(/\.0$/,'')} h`;$('mixN').textContent=m}
+function selectors(){$('month').innerHTML=M.map((x,i)=>`<option value="${i}" ${i===cur.getMonth()?'selected':''}>${x}</option>`).join('');let y=[];for(let i=2024;i<=2035;i++)y.push(i);$('year').innerHTML=y.map(x=>`<option ${x===cur.getFullYear()?'selected':''}>${x}</option>`).join('')}
+function render(){selectors();rates();cal();shifts();others();summary();save()}
+function open(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').classList.remove('hidden');$('modal').classList.add('flex')}$('modalClose').onclick=()=>{$('modal').classList.add('hidden');$('modal').classList.remove('flex')};
+function editShift(id){let s=md().shifts.find(x=>x.id===id);open('Editar guardia',`<div class="grid gap-4 sm:grid-cols-2"><label>Fecha<input id="eDate" type="date" value="${s.date}" class="mt-1 w-full rounded-xl border px-3 py-2"></label><label>Inicio<input id="eStart" type="time" value="${s.start}" class="mt-1 w-full rounded-xl border px-3 py-2"></label><label>Duración (h)<input id="eDur" type="number" min=".25" max="72" step=".25" value="${s.duration}" class="mt-1 w-full rounded-xl border px-3 py-2"></label><label>Criterio<select id="eMode" class="mt-1 w-full rounded-xl border px-3 py-2"><option value="auto" ${s.mode==='auto'?'selected':''}>Automático por franja</option><option value="week" ${s.mode==='week'?'selected':''}>Forzar semana</option><option value="premium" ${s.mode==='premium'?'selected':''}>Forzar finde/feriado</option></select></label></div><div class="mt-5 flex gap-2"><button id="eSave" class="rounded-xl bg-blue-600 px-4 py-2 text-white font-semibold">Guardar</button><button id="eDel" class="rounded-xl border border-red-200 px-4 py-2 text-red-700 font-semibold">Eliminar</button></div>`);$('eSave').onclick=()=>{s.date=$('eDate').value;s.start=$('eStart').value;s.duration=+$('eDur').value;s.mode=$('eMode').value;$('modalClose').click();save();render()};$('eDel').onclick=()=>{md().shifts=md().shifts.filter(x=>x.id!==id);$('modalClose').click();save();render()}}
+function grids(){let rows=[...S.grids].sort((a,b)=>a.effective.localeCompare(b.effective)).map(g=>`<div class="rounded-xl border p-4 flex flex-col gap-3 md:flex-row md:justify-between"><div><strong>${g.norm}</strong> <span class="tag ${g.official?'week':'mixed'}">${g.official?'OFICIAL':'PERSONALIZADA'}</span><div class="text-xs text-slate-500">Vigencia ${g.effective.split('-').reverse().join('/')}</div></div><div class="flex gap-2"><button data-id="${g.id}" class="dup rounded-lg border px-3 py-1 text-xs font-semibold">Duplicar</button><button data-id="${g.id}" class="gedit rounded-lg border px-3 py-1 text-xs font-semibold">Editar</button>${g.official?'':`<button data-id="${g.id}" class="gdel rounded-lg border border-red-200 px-3 py-1 text-xs font-semibold text-red-700">Eliminar</button>`}</div></div>`).join('');open('Grillas de valores',`<p class="text-sm text-slate-500 mb-4">Se aplica automáticamente la última grilla con vigencia anterior o igual al mes calculado.</p><div id="grows" class="space-y-3">${rows}</div><div class="mt-5 flex gap-2"><button id="gnew" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">+ Nueva grilla</button><button id="grestore" class="rounded-xl border px-4 py-2 text-sm font-semibold">Restaurar oficiales</button></div>`);document.querySelectorAll('.dup').forEach(b=>b.onclick=()=>gridEditor(b.dataset.id,true));document.querySelectorAll('.gedit').forEach(b=>b.onclick=()=>gridEditor(b.dataset.id,false));document.querySelectorAll('.gdel').forEach(b=>b.onclick=()=>{if(confirm('¿Eliminar esta grilla?')){S.grids=S.grids.filter(g=>g.id!==b.dataset.id);save();grids();render()}});$('gnew').onclick=()=>gridEditor(null,true);$('grestore').onclick=()=>{S.grids=[...cp(OFF),...S.grids.filter(g=>!g.official)];save();grids();render()}}
+function gridEditor(id,dup){let src=id?S.grids.find(g=>g.id===id):grid(),g=src?cp(src):cp(OFF[1]);if(dup){g.id='';g.norm='Copia de '+g.norm;g.effective=`${mk()}-01`;g.official=false}let body=Object.entries(C).map(([k,v])=>`<tr><td class="py-2 pr-2">${v}</td><td><input id="rw_${k}" type="number" value="${g.rates[k].week}" class="w-full rounded-lg border px-2 py-1"></td><td><input id="rp_${k}" type="number" value="${g.rates[k].premium}" class="w-full rounded-lg border px-2 py-1"></td></tr>`).join(''),other=Object.entries(OL).map(([k,v])=>`<label class="block"><span class="text-xs text-slate-500">${v}</span><input id="ro_${k}" type="number" value="${g.other[k]||0}" class="mt-1 w-full rounded-xl border px-3 py-2"></label>`).join('');open(dup||!id?'Nueva grilla':'Editar grilla',`<div class="grid gap-3 md:grid-cols-3"><label>Vigencia<input id="geff" type="date" value="${g.effective}" class="mt-1 w-full rounded-xl border px-3 py-2"></label><label class="md:col-span-2">Norma / nombre<input id="gnorm" value="${g.norm}" class="mt-1 w-full rounded-xl border px-3 py-2"></label></div><div class="mt-4 overflow-x-auto"><table class="w-full min-w-[600px] text-sm"><thead><tr><th class="text-left">Categoría</th><th>Semana 24 h</th><th>Finde/feriado 24 h</th></tr></thead><tbody>${body}</tbody></table></div><div class="mt-4 grid gap-3 md:grid-cols-2">${other}</div><button id="gsave" class="mt-5 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white">Guardar grilla</button>`);$('gsave').onclick=()=>{let rates={};Object.keys(C).forEach(k=>rates[k]={week:+$(`rw_${k}`).value||0,premium:+$(`rp_${k}`).value||0});let other={};Object.keys(OL).forEach(k=>other[k]=+$(`ro_${k}`).value||0);let n={id:dup||!id?'c-'+Date.now():id,effective:$('geff').value,norm:$('gnorm').value.trim()||'Grilla personalizada',official:false,rates,other};if(!n.effective)return alert('Ingresá una fecha de vigencia.');let i=S.grids.findIndex(x=>x.id===id);if(i>=0&&!dup)S.grids[i]=n;else S.grids.push(n);save();grids();render()}}
+function data(){let rows=Object.entries(S.manual).sort().map(([d,n])=>`<div class="flex justify-between rounded-lg bg-slate-50 px-3 py-2"><span><strong>${d.split('-').reverse().join('/')}</strong> · ${n}</span><button data-d="${d}" class="hdel text-xs text-red-600">Quitar</button></div>`).join('')||'<div class="text-sm text-slate-500">Sin feriados manuales.</div>';open('Datos y respaldo',`<div class="grid gap-3 sm:grid-cols-2"><button id="export" class="rounded-xl border p-4 text-left"><strong>Exportar respaldo</strong><div class="text-xs text-slate-500">Grillas, meses y feriados en JSON</div></button><label class="rounded-xl border p-4 cursor-pointer"><strong>Importar respaldo</strong><div class="text-xs text-slate-500">Restaurar desde JSON</div><input id="import" type="file" accept=".json" class="hidden"></label></div><div class="mt-5 rounded-xl border p-4"><h3 class="font-bold">Feriados manuales</h3><div class="mt-3 grid gap-2 sm:grid-cols-[auto_1fr_auto]"><input id="hd" type="date" class="rounded-xl border px-3 py-2"><input id="hn" placeholder="Descripción" class="rounded-xl border px-3 py-2"><button id="hadd" class="rounded-xl bg-slate-900 px-4 py-2 text-white">Agregar</button></div><div class="mt-3 space-y-2">${rows}</div></div>`);$('export').onclick=()=>{save();let b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`prestaciones-mendoza-${new Date().toISOString().slice(0,10)}.json`;a.click()};$('import').onchange=async e=>{try{let x=JSON.parse(await e.target.files[0].text());if(!x.grids||!x.months)throw 0;S={...base(),...x,ui:{...base().ui,...(x.ui||{})}};save();$('modalClose').click();render();alert('Respaldo importado.')}catch{alert('Archivo inválido.')}};$('hadd').onclick=()=>{if(!$('hd').value)return;S.manual[$('hd').value]=$('hn').value.trim()||'Feriado manual';save();data();render()};document.querySelectorAll('.hdel').forEach(b=>b.onclick=()=>{delete S.manual[b.dataset.d];save();data();render()})}
+$('gridsBtn').onclick=grids;$('dataBtn').onclick=data;$('otherBtn').onclick=()=>{open('Agregar prestación',`<label>Prestación<select id="ot" class="mt-1 w-full rounded-xl border px-3 py-2">${Object.entries(OL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label class="mt-4 block">Cantidad<input id="oq" type="number" min="1" value="1" class="mt-1 w-full rounded-xl border px-3 py-2"></label><button id="os" class="mt-5 rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white">Agregar</button>`);$('os').onclick=()=>{md().other.push({id:'o'+Date.now(),type:$('ot').value,qty:Math.max(1,+$('oq').value||1)});$('modalClose').click();save();render()}};$('prev').onclick=()=>{cur.setMonth(cur.getMonth()-1);render()};$('next').onclick=()=>{cur.setMonth(cur.getMonth()+1);render()};$('month').onchange=e=>{cur.setMonth(+e.target.value);render()};$('year').onchange=e=>{cur.setFullYear(+e.target.value);render()};$('cat').onchange=render;$('start').onchange=save;$('dur').onchange=save;$('clear').onclick=()=>{if(confirm(`¿Limpiar ${M[cur.getMonth()]} ${cur.getFullYear()}?`)){S.months[mk()]={shifts:[],other:[]};save();render()}};$('cat').value=S.ui.cat;$('start').value=S.ui.start;$('dur').value=String(S.ui.dur);render();
+})();
+</script>
+</body></html>
